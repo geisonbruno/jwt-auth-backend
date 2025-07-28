@@ -1,11 +1,10 @@
 services:
   postgres:
+    container_name: jwt_auth_postgres
     image: postgres:latest
     environment:
       POSTGRES_DB: auth_db
       POSTGRES_USER: gbruno
       POSTGRES_PASSWORD: gbruno11
     ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      - "5433:5432"
