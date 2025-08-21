@@ -5,21 +5,17 @@ import br.com.geisonbrunodev.jwtauthappbackend.dto.TokenDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.dto.UserRegisterDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.entity.User;
 import br.com.geisonbrunodev.jwtauthappbackend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JWTService jwtService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JWTService jwtService;
 
     public TokenDTO register(UserRegisterDTO userDTO) {
         User user = new User();
@@ -31,13 +27,11 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        // Gera os tokens JWT
         String accessToken = jwtService.generateToken(savedUser.getUsername(), savedUser.getRole().name());
         String refreshToken = jwtService.generateRefreshToken(savedUser.getUsername(), savedUser.getRole().name());
 
         return new TokenDTO(accessToken, refreshToken);
     }
-
 
     public TokenDTO authenticate(LoginDTO loginDTO) {
         User user = userRepository.findByUsername(loginDTO.getUsername())
