@@ -2,12 +2,15 @@ package br.com.geisonbrunodev.jwtauthappbackend.service;
 
 import br.com.geisonbrunodev.jwtauthappbackend.dto.LoginDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.dto.TokenDTO;
+import br.com.geisonbrunodev.jwtauthappbackend.dto.UserDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.dto.UserRegisterDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.entity.User;
 import br.com.geisonbrunodev.jwtauthappbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +53,11 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public List<UserDTO> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> new UserDTO(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole()))
+                .toList();
     }
 }
