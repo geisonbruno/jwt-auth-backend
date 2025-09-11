@@ -6,6 +6,7 @@ import br.com.geisonbrunodev.jwtauthappbackend.dto.UserDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.dto.UserRegisterDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.entity.User;
 import br.com.geisonbrunodev.jwtauthappbackend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +22,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Valid
     @PostMapping("/register")
     public TokenDTO register(@RequestBody UserRegisterDTO userDTO) {
         return userService.register(userDTO);
     }
 
+    @Valid
     @PostMapping("/login")
     public TokenDTO login(@RequestBody LoginDTO loginDTO) {
         return userService.authenticate(loginDTO);
@@ -33,7 +36,9 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getProfile(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+
         UserDTO dto = new UserDTO(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole());
         return ResponseEntity.ok(dto);
     }
