@@ -24,8 +24,11 @@ public class UserController {
 
     @Valid
     @PostMapping("/register")
-    public TokenDTO register(@RequestBody UserRegisterDTO userDTO) {
-        return userService.register(userDTO);
+    public ResponseEntity<TokenDTO> register(@Valid @RequestBody UserRegisterDTO userDTO) {
+        TokenDTO token = userService.register(userDTO);
+        return ResponseEntity
+                .status(201)
+                .body(token);
     }
 
     @Valid
