@@ -5,8 +5,10 @@ import br.com.geisonbrunodev.jwtauthappbackend.dto.TokenDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.dto.UserDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.dto.UserRegisterDTO;
 import br.com.geisonbrunodev.jwtauthappbackend.entity.User;
+import br.com.geisonbrunodev.jwtauthappbackend.enums.Role;
 import br.com.geisonbrunodev.jwtauthappbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,7 @@ public class UserService {
         user.setName(userDTO.getName());
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        user.setRole(userDTO.getRole());
+        user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
         User savedUser = userRepository.save(user);
@@ -38,10 +40,10 @@ public class UserService {
 
     public TokenDTO authenticate(LoginDTO loginDTO) {
         User user = userRepository.findByUsername(loginDTO.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new BadCredentialsException("Invalid credentials");
         }
 
         String accessToken = jwtService.generateToken(user.getUsername(), user.getRole().name());
@@ -52,7 +54,7 @@ public class UserService {
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
     }
 
     public List<UserDTO> findAllUsers() {
